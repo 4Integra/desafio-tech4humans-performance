@@ -1,0 +1,181 @@
+DIAGNÓSTICO D01 PÓS-BATCHING — EVIDÊNCIAS
+
+1. CONTEXTO
+
+- Repositório: /home/kakau/meu-desafio
+- Branch: main
+- HEAD durante a coleta: d7861b96af70df31cf2eda071ab4ddabeaa36c64
+- Árvore Git antes da coleta: limpa
+- Containers: API ativa; PostgreSQL ativo e saudável.
+- Coleta: 20/11/2026, após os batchings de itens e produtos.
+- Todas as consultas foram executadas em transação READ ONLY, com
+  statement_timeout=30000 ms e lock_timeout=2000 ms.
+- Script reproduzível: diagnostico/D01-clientes-pedidos/pos-batching-comandos.sql
+
+2. MEDIDO — RESULTADOS OFICIAIS JÁ EXISTENTES
+
+Fontes consultadas, sem alteração:
+- resultados/20261120-093234-00-linha-de-base
+- resultados/20261120-093458-00-linha-de-base
+- resultados/20261120-093707-00-linha-de-base
+- resultados/20261120-154316-01-lote-itens-d01
+- resultados/20261120-154522-01-lote-itens-d01
+- resultados/20261120-154732-01-lote-itens-d01
+- resultados/20261120-164142-02-lote-produtos-d01
+- resultados/20261120-164345-02-lote-produtos-d01
+- resultados/20261120-164549-02-lote-produtos-d01
+
+A rota D01 tem peso configurado de 20%.
+
+Configuração              mediana dos três p95 D01
+Linha de base             33988.5 ms
+O1 — lote de itens        29483.1 ms
+O2 — lote de produtos     16084.4 ms
+
+Detalhe das três execuções O2:
+Execução                                req   mediana D01   p95 D01
+20261120-164142-02-lote-produtos-d01     42    12151.6 ms    14591.5 ms
+20261120-164345-02-lote-produtos-d01     43    11498.2 ms    17781.7 ms
+20261120-164549-02-lote-produtos-d01     42    11596.5 ms    16084.4 ms
+
+Derivado dos recursos.csv oficiais: a mediana das médias de CPU do PostgreSQL
+nas três execuções O2 é 96.9612%. Essa métrica pertence à carga mista e não pode
+ser atribuída exclusivamente a D01.
+
+3. OBSERVADO NO CÓDIGO ATUAL
+
+- api/src/rotas.js:66: consulta o cliente por chave primária.
+- api/src/rotas.js:69-72: consulta pedidos por cliente_id, com ordenação.
+- api/src/rotas.js:77-80: executa uma consulta de itens para os cinco pedidos,
+  com pedido_id = ANY($1), em vez de uma consulta por pedido.
+- api/src/rotas.js:86-89: deduplica os IDs e executa uma consulta de produtos,
+  com id = ANY($1), em vez de uma consulta por item.
+- api/src/db.js:10-18: cada chamada ainda abre e encerra um Client PostgreSQL.
+
+Contagem derivada do código e das cardinalidades do caso selecionado:
+- Implementação original: 1 cliente + 1 pedidos + 5 itens + 15 produtos =
+  22 consultas sequenciais.
+- Implementação atual: 1 cliente + 1 pedidos + 1 itens + 1 produtos =
+  4 consultas sequenciais.
+- A contagem é derivada do caminho de execução; não é uma medição de duração.
+
+4. MEDIDO — PARÂMETROS FIXADOS ANTES DOS EXPLAIN
+
+Foi mantido o caso mediano do diagnóstico original para permitir comparação:
+- cliente: 3;
+- pedidos, na ordem da rota: 43262, 143262, 243262, 343262 e 443262;
+- itens: 15, três por pedido;
+- produtos únicos usados pelo lote: 125, 12886 e 13892.
+
+Índices encontrados:
+- clientes_pkey ON clientes(id)
+- pedidos_pkey ON pedidos(id)
+- itens_pedido_pkey ON itens_pedido(id)
+- produtos_pkey ON produtos(id)
+
+Não foi encontrado índice em pedidos(cliente_id) nem itens_pedido(pedido_id).
+
+5. MEDIDO — EXPLAIN (ANALYZE, BUFFERS, SETTINGS)
+
+5.1 Pedidos do cliente 3 — consulta atual, repetição 1
+
+Gather Merge; estimativa 4 linhas; 5 linhas reais.
+  Parallel Seq Scan on pedidos; 3 loops.
+  Estimativa 2 linhas por worker; 2 linhas reais por worker.
+  Rows Removed by Filter: 166665 por loop (499995 no total).
+  Sort Method: quicksort; 25 kB por processo.
+Buffers no plano: shared hit=13348 read=7612 (20960 blocos).
+Planning Time: 0.133 ms.
+Execution Time: 122.493 ms.
+
+5.2 Pedidos do cliente 3 — repetição 2
+
+Mesmo plano: Gather Merge, Sort e Parallel Seq Scan.
+Rows Removed by Filter: 166665 por loop; 3 loops.
+Buffers: shared hit=13382 read=7578 (20960 blocos).
+Planning Time: 0.092 ms.
+Execution Time: 177.448 ms.
+
+5.3 Pedidos do cliente 3 — repetição 3
+
+Mesmo plano: Gather Merge, Sort e Parallel Seq Scan.
+Rows Removed by Filter: 166665 por loop; 3 loops.
+Buffers: shared hit=13478 read=7482 (20960 blocos).
+Planning Time: 0.118 ms.
+Execution Time: 111.014 ms.
+
+5.4 Itens dos cinco pedidos — consulta em lote, repetição 1
+
+Gather Merge; estimativa 16 linhas; 15 linhas reais.
+  Parallel Seq Scan on itens_pedido; 3 loops.
+  Estimativa 8 linhas por worker; 5 linhas reais por worker.
+  Rows Removed by Filter: 499995 por loop (1499985 no total).
+  Sort Method: quicksort; 25 kB por processo.
+Buffers no plano: shared hit=2705 read=6962 (9667 blocos).
+Planning Time: 0.138 ms.
+Execution Time: 284.516 ms.
+
+5.5 Itens dos cinco pedidos — repetição 2
+
+Mesmo plano: Gather Merge, Sort e Parallel Seq Scan.
+Rows Removed by Filter: 499995 por loop; 3 loops.
+Buffers: shared hit=2801 read=6866 (9667 blocos).
+Planning Time: 0.089 ms.
+Execution Time: 212.529 ms.
+
+5.6 Itens dos cinco pedidos — repetição 3
+
+Mesmo plano: Gather Merge, Sort e Parallel Seq Scan.
+Rows Removed by Filter: 499995 por loop; 3 loops.
+Buffers: shared hit=2897 read=6770 (9667 blocos).
+Planning Time: 0.175 ms.
+Execution Time: 197.650 ms.
+
+5.7 Produtos 125, 12886 e 13892 — consulta em lote
+
+As três repetições usaram Index Scan using produtos_pkey.
+Estimativa: 3 linhas; resultado real: 3 linhas.
+
+Repetição   Buffers                  Planning Time   Execution Time
+1           shared hit=12            1.249 ms        0.053 ms
+2           shared hit=9             0.135 ms        0.095 ms
+3           shared hit=9             0.177 ms        0.078 ms
+
+Na primeira repetição, o planejamento registrou shared hit=22 read=1.
+
+6. COMPARAÇÃO COM O DIAGNÓSTICO ORIGINAL
+
+Medido no diagnóstico original:
+- pedidos: um Parallel Seq Scan em 500000 linhas para devolver 5; execuções
+  isoladas de 207.234, 183.969 e 113.931 ms;
+- itens: cada consulta por um pedido fazia Parallel Seq Scan em 1500000 linhas
+  para devolver 3; execuções isoladas de 203.266, 187.488 e 116.347 ms;
+- produto: a consulta de um ID usou produtos_pkey; execução isolada de 1.339 ms.
+
+Observado/derivado na implementação atual:
+- a consulta de pedidos não mudou: permanece uma varredura completa por D01;
+- itens passou de cinco varreduras completas para uma única varredura completa,
+  que devolve os 15 itens;
+- produtos passou de até 15 consultas indexadas para uma consulta indexada que,
+  neste caso, devolve os três produtos únicos;
+- o batching reduziu operações repetidas, mas não mudou o acesso de pedidos e
+  itens para Index Scan.
+
+Não se interpreta a diferença entre tempos isolados antigos e novos como efeito
+causal do batching: as sessões e o estado de cache não foram controlados. Também
+não se somam os tempos de EXPLAIN como decomposição da latência HTTP.
+
+7. INTERPRETAÇÃO LIMITADA PELAS EVIDÊNCIAS
+
+As duas varreduras completas ainda realizam trabalho desproporcional ao resultado:
+filtram 499995 pedidos e 1499985 itens para devolver 5 e 15 linhas. Em cada
+repetição, acessam aproximadamente 20960 e 9667 blocos compartilhados.
+
+Isso sustenta que os scans continuam sendo um mecanismo plausível de consumo de
+CPU e buffers por requisição D01. A CPU média do banco próxima do limite na O2 é
+compatível com contenção sob carga, mas é uma correlação da carga mista.
+
+Os EXPLAIN isolados terminaram em centenas de milissegundos, enquanto as medianas
+HTTP de D01 na O2 ficaram entre 11498.2 e 12151.6 ms. Portanto, esta coleta não
+demonstra que os scans, sozinhos, expliquem a latência restante. Fila sob carga,
+custo das conexões e interferência das demais rotas não foram decompostos.

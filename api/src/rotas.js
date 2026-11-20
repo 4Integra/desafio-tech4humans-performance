@@ -71,9 +71,21 @@ rotas.get('/clientes/:id/pedidos', assincrono(async (req, res) => {
     [id],
   );
 
+  const itensPorPedido = new Map();
+  if (pedidos.length > 0) {
+    const itens = await consultar(
+      'SELECT * FROM itens_pedido WHERE pedido_id = ANY($1) ORDER BY pedido_id, id',
+      [pedidos.map((pedido) => pedido.id)],
+    );
+    for (const item of itens) {
+      if (!itensPorPedido.has(item.pedido_id)) itensPorPedido.set(item.pedido_id, []);
+      itensPorPedido.get(item.pedido_id).push(item);
+    }
+  }
+
   const resposta = [];
   for (const pedido of pedidos) {
-    const itens = await consultar('SELECT * FROM itens_pedido WHERE pedido_id = $1 ORDER BY id', [pedido.id]);
+    const itens = itensPorPedido.get(pedido.id) || [];
 
     const itensFormatados = [];
     let total = 0;

@@ -1,0 +1,17 @@
+Medição: 02-lote-produtos-d01
+Carga: 20 usuários virtuais por 60s
+
+Requisições:        202
+Requisições/s:      2.96
+Tempo de resposta:  mediana 1381.2 ms | p95 18060.2 ms | p99 46715.4 ms
+Erros:              0.00%
+
+Por rota:
+rota                  req       mediana       p95           p99           erros   
+cliente               51        490.1 ms      937.4 ms      1796.5 ms     0.0%    
+cliente-por-email     34        1342.8 ms     1896.3 ms     1961.1 ms     0.0%    
+pedidos-do-cliente    43        11498.2 ms    17781.7 ms    19802.9 ms    0.0%    
+pedidos-por-status    23        14391.9 ms    44990.0 ms    48928.3 ms    0.0%    
+busca-produtos        33        798.8 ms      1204.2 ms     1266.3 ms     0.0%    
+vendas-por-dia        15        12813.4 ms    19717.9 ms    20275.7 ms    0.0%    
+top-produtos          3         28375.4 ms    54136.5 ms    56426.3 ms    0.0%    

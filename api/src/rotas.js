@@ -72,6 +72,7 @@ rotas.get('/clientes/:id/pedidos', assincrono(async (req, res) => {
   );
 
   const itensPorPedido = new Map();
+  const produtosPorId = new Map();
   if (pedidos.length > 0) {
     const itens = await consultar(
       'SELECT * FROM itens_pedido WHERE pedido_id = ANY($1) ORDER BY pedido_id, id',
@@ -80,6 +81,12 @@ rotas.get('/clientes/:id/pedidos', assincrono(async (req, res) => {
     for (const item of itens) {
       if (!itensPorPedido.has(item.pedido_id)) itensPorPedido.set(item.pedido_id, []);
       itensPorPedido.get(item.pedido_id).push(item);
+    }
+
+    const produtoIds = [...new Set(itens.map((item) => item.produto_id))];
+    if (produtoIds.length > 0) {
+      const produtos = await consultar('SELECT * FROM produtos WHERE id = ANY($1) ORDER BY id', [produtoIds]);
+      for (const produto of produtos) produtosPorId.set(produto.id, produto);
     }
   }
 
@@ -90,7 +97,7 @@ rotas.get('/clientes/:id/pedidos', assincrono(async (req, res) => {
     const itensFormatados = [];
     let total = 0;
     for (const item of itens) {
-      const [produto] = await consultar('SELECT * FROM produtos WHERE id = $1', [item.produto_id]);
+      const produto = produtosPorId.get(item.produto_id);
       itensFormatados.push({
         produto_id: item.produto_id,
         produto_nome: produto.nome,

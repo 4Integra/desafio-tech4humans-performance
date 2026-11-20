@@ -1,0 +1,152 @@
+DIAGNÓSTICO D01 — EVIDÊNCIAS
+
+Contexto
+- Repositório: /home/kakau/meu-desafio
+- Branch: main
+- HEAD durante a coleta: 558c4625
+- Árvore Git antes da coleta: limpa
+- Containers: API ativa; PostgreSQL ativo e saudável
+- Todas as consultas foram somente leitura, com statement_timeout=30000 ms e
+  lock_timeout=2000 ms na sessão.
+
+1. MEDIDO — LINHA DE BASE
+
+Fonte: resultados/*-00-linha-de-base/resumo-k6.json
+Rota: GET /clientes/:id/pedidos; peso configurado: 20%.
+
+Execução                         req  mediana (ms)    p95 (ms)         p99 (ms)          máxima (ms)     erros
+20261120-093234-00-linha-de-base  28  28827.875152    53565.0967875    54492.81762458     54751.820834    0%
+20261120-093458-00-linha-de-base  33  25091.770438    33056.142382     36692.57377684     37939.210237    0%
+20261120-093707-00-linha-de-base  32  26027.9899075   33988.54593475   34412.23902339     34553.142031    0%
+
+Mediana das três medianas: 26027.9899075 ms.
+Mediana dos três p95: 33988.54593475 ms.
+Observação: são apenas 28 a 33 amostras D01 por execução; os percentis de cauda
+são sensíveis a poucas observações.
+
+2. OBSERVADO NO CÓDIGO
+
+- api/src/db.js:10-18: cada chamada a consultar cria Client, conecta, executa uma
+  consulta e encerra a conexão.
+- api/src/rotas.js:62-101: a rota consulta cliente e pedidos; para cada pedido,
+  consulta itens; para cada item, consulta produto. Todos os awaits são sequenciais.
+- api/src/rotas.js:69-76: pedidos e itens são filtrados pelas chaves estrangeiras
+  cliente_id e pedido_id.
+- banco/01-estrutura.sql:1-30: os únicos índices criados são as chaves primárias.
+- carga/teste-carga.js:44-48,87-95: D01 tem peso 20%, cliente uniforme entre 1 e
+  100000, 20 VUs sequenciais e timeout HTTP de 60s.
+
+Contagem derivada do código, conferida pelas cardinalidades medidas:
+- Todo cliente tem 5 pedidos.
+- Clientes selecionados: 1 (1 item/pedido), 3 (3 itens/pedido), 5 (5 itens/pedido).
+- Consultas por requisição = 1 cliente + 1 pedidos + 5 itens + uma por produto.
+- Caso baixo: 12 consultas/conexões sequenciais.
+- Caso mediano: 22 consultas/conexões sequenciais.
+- Caso alto: 32 consultas/conexões sequenciais.
+
+3. MEDIDO — CARDINALIDADES E ÍNDICES
+
+ clientes | pedidos | itens_pedido | produtos
+ 100000   | 500000  | 1500000      | 20000
+
+ min_pedidos | mediana_pedidos | max_pedidos | media_pedidos
+ 5           | 5               | 5           | 5.0000000000000000
+
+ min_itens | mediana_itens | max_itens | media_itens
+ 1         | 3             | 5         | 3.0000000000000000
+
+Parâmetros fixados antes dos planos:
+- cliente_1_item=1; cliente_3_itens=3; cliente_5_itens=5.
+- cliente 3: pedidos 43262, 143262, 243262, 343262 e 443262; 3 itens em cada.
+- pedido 43262: produtos 12886, 125 e 13892.
+
+Índices existentes:
+- clientes_pkey ON clientes(id)
+- pedidos_pkey ON pedidos(id)
+- itens_pedido_pkey ON itens_pedido(id)
+- produtos_pkey ON produtos(id)
+Não foi encontrado índice em pedidos(cliente_id) ou itens_pedido(pedido_id).
+
+4. MEDIDO — EXPLAIN (ANALYZE, BUFFERS, SETTINGS)
+
+4.1 Cliente id=3
+Index Scan using clientes_pkey on clientes
+  actual time=0.736..0.740 rows=1 loops=1
+  Buffers: shared hit=1 read=2
+Planning Time: 1.756 ms
+Execution Time: 1.000 ms
+
+4.2 Pedidos do cliente 3 — repetição 1
+Gather Merge (actual time=201.677..207.164 rows=5 loops=1)
+  Buffers: shared hit=7113 read=13847
+  -> Sort; Sort Method: quicksort; Memory: 25kB
+  -> Parallel Seq Scan on pedidos
+       actual time=73.414..195.828 rows=2 loops=3
+       Filter: cliente_id = 3
+       Rows Removed by Filter: 166665 por loop
+       Buffers: shared hit=6987 read=13847
+Planning Time: 0.302 ms
+Execution Time: 207.234 ms
+
+4.3 Pedidos do cliente 3 — repetição 2
+Parallel Seq Scan on pedidos; rows=2 loops=3; Rows Removed by Filter=166665 por loop
+Buffers: shared hit=7209 read=13751
+Execution Time: 183.969 ms
+
+4.4 Pedidos do cliente 3 — repetição 3
+Parallel Seq Scan on pedidos; rows=2 loops=3; Rows Removed by Filter=166665 por loop
+Buffers: shared hit=7305 read=13655
+Execution Time: 113.931 ms
+
+4.5 Itens do pedido 43262 — repetição 1
+Sort (actual time=196.212..203.246 rows=3 loops=1)
+  Buffers: shared hit=6737 read=2818
+  -> Gather
+     -> Parallel Seq Scan on itens_pedido
+          actual time=190.653..192.302 rows=1 loops=3
+          Filter: pedido_id = 43262
+          Rows Removed by Filter: 499999 por loop
+          Buffers: shared hit=6737 read=2818
+Planning Time: 0.287 ms
+Execution Time: 203.266 ms
+
+4.6 Itens do pedido 43262 — repetição 2
+Parallel Seq Scan on itens_pedido; rows=1 loops=3; Rows Removed by Filter=499999 por loop
+Buffers: shared hit=6833 read=2722
+Execution Time: 187.488 ms
+
+4.7 Itens do pedido 43262 — repetição 3
+Parallel Seq Scan on itens_pedido; rows=1 loops=3; Rows Removed by Filter=499999 por loop
+Buffers: shared hit=6929 read=2626
+Execution Time: 116.347 ms
+
+4.8 Produto id=12886
+Index Scan using produtos_pkey on produtos
+  actual time=1.317..1.320 rows=1 loops=1
+  Buffers: shared read=3
+Planning Time: 3.823 ms
+Execution Time: 1.339 ms
+
+Resumo dos planos:
+- A consulta de pedidos varreu 500000 linhas para devolver 5.
+- Cada consulta de itens varreu 1500000 linhas para devolver 3 no caso mediano.
+- A rota executa a consulta de itens 5 vezes; portanto, uma requisição mediana
+  provoca cinco varreduras completas dessa tabela.
+- Consultas por chave primária de cliente e produto usaram índices e terminaram
+  em aproximadamente 1 ms nas observações isoladas.
+- Os tempos de EXPLAIN isolados não são somados como decomposição da latência HTTP.
+
+5. MEDIDO — RECURSOS DA LINHA DE BASE
+
+Fonte: recursos.csv das três execuções. Campos: número de amostras, média, mínimo,
+máximo de cpu_percentual, calculados diretamente das linhas de cada container.
+
+Execução   Banco (n média min max)          API (n média min max)
+09:32:34   36 81.8028 0.02 108.9           36 14.5181 0 200.08
+09:34:58   36 95.8186 26.76 106.27         36 9.20139 2.66 17.89
+09:37:07   37 95.6324 0.02 108.91          37 8.94919 0.24 19.43
+
+O banco tem limite de 1 CPU e 512 MiB (docker-compose.yml:25-29). A API tem limite
+de 0,5 CPU e 256 MiB (docker-compose.yml:44-48). O máximo 200.08% da API na
+primeira execução é um outlier inconsistente e não sustenta a interpretação.
+As métricas são da carga mista e não podem ser atribuídas exclusivamente a D01.

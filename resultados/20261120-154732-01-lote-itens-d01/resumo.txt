@@ -1,0 +1,17 @@
+Medição: 01-lote-itens-d01
+Carga: 20 usuários virtuais por 60s
+
+Requisições:        157
+Requisições/s:      2.28
+Tempo de resposta:  mediana 1402.2 ms | p95 30586.3 ms | p99 39240.7 ms
+Erros:              0.00%
+
+Por rota:
+rota                  req       mediana       p95           p99           erros   
+cliente               42        501.4 ms      808.9 ms      1753.4 ms     0.0%    
+cliente-por-email     25        1307.3 ms     1856.7 ms     1973.2 ms     0.0%    
+pedidos-do-cliente    33        22103.7 ms    33896.3 ms    36637.0 ms    0.0%    
+pedidos-por-status    19        11901.2 ms    33211.5 ms    39947.5 ms    0.0%    
+busca-produtos        25        807.5 ms      1099.4 ms     1461.0 ms     0.0%    
+vendas-por-dia        11        8505.1 ms     26373.8 ms    27366.3 ms    0.0%    
+top-produtos          2         31485.8 ms    51748.6 ms    53549.7 ms    0.0%    

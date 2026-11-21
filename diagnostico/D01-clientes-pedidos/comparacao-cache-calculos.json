@@ -1,0 +1,822 @@
+{
+  "runs": [
+    {
+      "id": "o2-1",
+      "config": "O2",
+      "result": "20261120-215930-diag-cache-o2",
+      "before": "2026-11-21T00:59:30.802563+00:00",
+      "after": "2026-11-21T01:01:24.179762+00:00",
+      "stats_reset": "2026-11-21T00:58:23.290396+00:00",
+      "shared_buffers": "128MB",
+      "track_io_timing": "off",
+      "summary": {
+        "requests": 109,
+        "rps": 1.5,
+        "median_ms": 4800.5,
+        "p95_ms": 33979.6,
+        "p99_ms": 52127.3,
+        "errors_pct": 0,
+        "routes": {
+          "cliente": {
+            "requests": 28,
+            "median_ms": 1052.4,
+            "p95_ms": 2360.8,
+            "p99_ms": 2618.1,
+            "errors_pct": 0
+          },
+          "cliente-por-email": {
+            "requests": 21,
+            "median_ms": 4200,
+            "p95_ms": 6202.7,
+            "p99_ms": 6366.8,
+            "errors_pct": 0
+          },
+          "pedidos-do-cliente": {
+            "requests": 25,
+            "median_ms": 21386.8,
+            "p95_ms": 32014.4,
+            "p99_ms": 33769.9,
+            "errors_pct": 0
+          },
+          "pedidos-por-status": {
+            "requests": 14,
+            "median_ms": 26741.8,
+            "p95_ms": 50934.8,
+            "p99_ms": 52022.7,
+            "errors_pct": 0
+          },
+          "busca-produtos": {
+            "requests": 13,
+            "median_ms": 2198.4,
+            "p95_ms": 3796.2,
+            "p99_ms": 3801.2,
+            "errors_pct": 0
+          },
+          "vendas-por-dia": {
+            "requests": 7,
+            "median_ms": 26817.6,
+            "p95_ms": 33730.8,
+            "p99_ms": 33850.5,
+            "errors_pct": 0
+          },
+          "top-produtos": {
+            "requests": 1,
+            "median_ms": 57375.6,
+            "p95_ms": 57375.6,
+            "p99_ms": 57375.6,
+            "errors_pct": 0
+          }
+        }
+      },
+      "resources": {
+        "api_cpu": 7.782972972972973,
+        "api_mem": 28.818108108108106,
+        "db_cpu": 99.44081081081082,
+        "db_mem": 394.2972972972973
+      },
+      "normal": {
+        "reads": 122,
+        "hits": 157414,
+        "evictions": 0,
+        "hit_rate": 0.9992255738370912
+      },
+      "bulk": {
+        "reads": 1773112,
+        "hits": 723812,
+        "evictions": 0,
+        "reuses": 1762306
+      },
+      "tables": {
+        "pedidos": {
+          "heap_blks_read": 1464007,
+          "heap_blks_hit": 577778,
+          "idx_blks_read": 0,
+          "idx_blks_hit": 205
+        },
+        "itens_pedido": {
+          "heap_blks_read": 331491,
+          "heap_blks_hit": 184485,
+          "idx_blks_read": 0,
+          "idx_blks_hit": 53
+        }
+      },
+      "new_index": {},
+      "per_request": {
+        "normal_reads": 1.1192660550458715,
+        "normal_hits": 1444.165137614679,
+        "normal_evictions": 0,
+        "bulk_reads": 16267.08256880734,
+        "bulk_reuses": 16167.944954128441,
+        "pedidos_heap_read": 13431.256880733945,
+        "pedidos_heap_hit": 5300.715596330275,
+        "itens_heap_read": 3041.201834862385,
+        "itens_heap_hit": 1692.5229357798164,
+        "index_read": 0,
+        "index_hit": 0
+      }
+    },
+    {
+      "id": "o3-1",
+      "config": "O3",
+      "result": "20261120-220316-diag-cache-o3",
+      "before": "2026-11-21T01:03:16.588824+00:00",
+      "after": "2026-11-21T01:05:14.031706+00:00",
+      "stats_reset": "2026-11-21T01:01:58.28055+00:00",
+      "shared_buffers": "128MB",
+      "track_io_timing": "off",
+      "summary": {
+        "requests": 164,
+        "rps": 2.31,
+        "median_ms": 2756,
+        "p95_ms": 28249.7,
+        "p99_ms": 51486.1,
+        "errors_pct": 0.61,
+        "routes": {
+          "cliente": {
+            "requests": 43,
+            "median_ms": 855.6,
+            "p95_ms": 2057.3,
+            "p99_ms": 2368.4,
+            "errors_pct": 0
+          },
+          "cliente-por-email": {
+            "requests": 31,
+            "median_ms": 2876.8,
+            "p95_ms": 4444.9,
+            "p99_ms": 4505.4,
+            "errors_pct": 0
+          },
+          "pedidos-do-cliente": {
+            "requests": 32,
+            "median_ms": 9947.5,
+            "p95_ms": 15331.2,
+            "p99_ms": 16330.8,
+            "errors_pct": 0
+          },
+          "pedidos-por-status": {
+            "requests": 20,
+            "median_ms": 19797.2,
+            "p95_ms": 38328.3,
+            "p99_ms": 40297,
+            "errors_pct": 0
+          },
+          "busca-produtos": {
+            "requests": 25,
+            "median_ms": 1392.3,
+            "p95_ms": 2077.3,
+            "p99_ms": 2105.5,
+            "errors_pct": 0
+          },
+          "vendas-por-dia": {
+            "requests": 12,
+            "median_ms": 21772.7,
+            "p95_ms": 52317.7,
+            "p99_ms": 56891.8,
+            "errors_pct": 0
+          },
+          "top-produtos": {
+            "requests": 1,
+            "median_ms": 59998.1,
+            "p95_ms": 59998.1,
+            "p99_ms": 59998.1,
+            "errors_pct": 100
+          }
+        }
+      },
+      "resources": {
+        "api_cpu": 13.555555555555559,
+        "api_mem": 37.43333333333333,
+        "db_cpu": 101.18833333333335,
+        "db_mem": 385.8833333333334
+      },
+      "normal": {
+        "reads": 9163,
+        "hits": 448837,
+        "evictions": 5772,
+        "hit_rate": 0.9799934497816594
+      },
+      "bulk": {
+        "reads": 1820556,
+        "hits": 839300,
+        "evictions": 3975,
+        "reuses": 1810855
+      },
+      "tables": {
+        "pedidos": {
+          "heap_blks_read": 1789702,
+          "heap_blks_hit": 835448,
+          "idx_blks_read": 4,
+          "idx_blks_hit": 265
+        },
+        "itens_pedido": {
+          "heap_blks_read": 59459,
+          "heap_blks_hit": 101819,
+          "idx_blks_read": 2301,
+          "idx_blks_hit": 192530
+        }
+      },
+      "new_index": {
+        "idx_blks_read": 2301,
+        "idx_blks_hit": 192463,
+        "idx_scan": 64895,
+        "idx_tup_read": 194564,
+        "idx_tup_fetch": 194546
+      },
+      "per_request": {
+        "normal_reads": 55.8719512195122,
+        "normal_hits": 2736.810975609756,
+        "normal_evictions": 35.19512195121951,
+        "bulk_reads": 11100.951219512195,
+        "bulk_reuses": 11041.798780487805,
+        "pedidos_heap_read": 10912.817073170732,
+        "pedidos_heap_hit": 5094.195121951219,
+        "itens_heap_read": 362.5548780487805,
+        "itens_heap_hit": 620.8475609756098,
+        "index_read": 14.03048780487805,
+        "index_hit": 1173.5548780487804
+      }
+    },
+    {
+      "id": "o2-2",
+      "config": "O2",
+      "result": "20261120-220651-diag-cache-o2",
+      "before": "2026-11-21T01:06:51.815273+00:00",
+      "after": "2026-11-21T01:08:53.388854+00:00",
+      "stats_reset": "2026-11-21T01:05:38.280746+00:00",
+      "shared_buffers": "128MB",
+      "track_io_timing": "off",
+      "summary": {
+        "requests": 112,
+        "rps": 1.52,
+        "median_ms": 4551.8,
+        "p95_ms": 36110.1,
+        "p99_ms": 44261.8,
+        "errors_pct": 0,
+        "routes": {
+          "cliente": {
+            "requests": 29,
+            "median_ms": 1291.6,
+            "p95_ms": 2196.2,
+            "p99_ms": 2262.8,
+            "errors_pct": 0
+          },
+          "cliente-por-email": {
+            "requests": 22,
+            "median_ms": 4508.5,
+            "p95_ms": 5910.8,
+            "p99_ms": 6148.2,
+            "errors_pct": 0
+          },
+          "pedidos-do-cliente": {
+            "requests": 22,
+            "median_ms": 25708.9,
+            "p95_ms": 35607.8,
+            "p99_ms": 37674.5,
+            "errors_pct": 0
+          },
+          "pedidos-por-status": {
+            "requests": 16,
+            "median_ms": 23455.8,
+            "p95_ms": 43499.3,
+            "p99_ms": 44214.1,
+            "errors_pct": 0
+          },
+          "busca-produtos": {
+            "requests": 15,
+            "median_ms": 2097.5,
+            "p95_ms": 3223.9,
+            "p99_ms": 3597.6,
+            "errors_pct": 0
+          },
+          "vendas-por-dia": {
+            "requests": 7,
+            "median_ms": 27417.5,
+            "p95_ms": 37799.5,
+            "p99_ms": 39403.3,
+            "errors_pct": 0
+          },
+          "top-produtos": {
+            "requests": 1,
+            "median_ms": 57760.7,
+            "p95_ms": 57760.7,
+            "p99_ms": 57760.7,
+            "errors_pct": 0
+          }
+        }
+      },
+      "resources": {
+        "api_cpu": 8.79394736842105,
+        "api_mem": 24.165263157894735,
+        "db_cpu": 97.81157894736842,
+        "db_mem": 394.6684210526316
+      },
+      "normal": {
+        "reads": 117,
+        "hits": 154200,
+        "evictions": 0,
+        "hit_rate": 0.9992418204086394
+      },
+      "bulk": {
+        "reads": 1717737,
+        "hits": 740967,
+        "evictions": 0,
+        "reuses": 1707031
+      },
+      "tables": {
+        "pedidos": {
+          "heap_blks_read": 1424305,
+          "heap_blks_hit": 617480,
+          "idx_blks_read": 0,
+          "idx_blks_hit": 205
+        },
+        "itens_pedido": {
+          "heap_blks_read": 316000,
+          "heap_blks_hit": 161756,
+          "idx_blks_read": 0,
+          "idx_blks_hit": 49
+        }
+      },
+      "new_index": {},
+      "per_request": {
+        "normal_reads": 1.0446428571428572,
+        "normal_hits": 1376.7857142857142,
+        "normal_evictions": 0,
+        "bulk_reads": 15336.9375,
+        "bulk_reuses": 15241.348214285714,
+        "pedidos_heap_read": 12717.00892857143,
+        "pedidos_heap_hit": 5513.214285714285,
+        "itens_heap_read": 2821.4285714285716,
+        "itens_heap_hit": 1444.25,
+        "index_read": 0,
+        "index_hit": 0
+      }
+    },
+    {
+      "id": "o3-2",
+      "config": "O3",
+      "result": "20261120-221021-diag-cache-o3",
+      "before": "2026-11-21T01:10:21.374782+00:00",
+      "after": "2026-11-21T01:12:16.715849+00:00",
+      "stats_reset": "2026-11-21T01:09:14.511905+00:00",
+      "shared_buffers": "128MB",
+      "track_io_timing": "off",
+      "summary": {
+        "requests": 162,
+        "rps": 2.33,
+        "median_ms": 3032.1,
+        "p95_ms": 28001.8,
+        "p99_ms": 50368.4,
+        "errors_pct": 0.62,
+        "routes": {
+          "cliente": {
+            "requests": 41,
+            "median_ms": 1095.2,
+            "p95_ms": 1793,
+            "p99_ms": 2309.1,
+            "errors_pct": 0
+          },
+          "cliente-por-email": {
+            "requests": 31,
+            "median_ms": 3298.7,
+            "p95_ms": 5099.4,
+            "p99_ms": 5996.9,
+            "errors_pct": 0
+          },
+          "pedidos-do-cliente": {
+            "requests": 31,
+            "median_ms": 11399.8,
+            "p95_ms": 14529.4,
+            "p99_ms": 16376.2,
+            "errors_pct": 0
+          },
+          "pedidos-por-status": {
+            "requests": 19,
+            "median_ms": 20206.7,
+            "p95_ms": 36301.4,
+            "p99_ms": 44478,
+            "errors_pct": 0
+          },
+          "busca-produtos": {
+            "requests": 28,
+            "median_ms": 1525.7,
+            "p95_ms": 2560,
+            "p99_ms": 2821.9,
+            "errors_pct": 0
+          },
+          "vendas-por-dia": {
+            "requests": 10,
+            "median_ms": 23380.2,
+            "p95_ms": 47595,
+            "p99_ms": 57517,
+            "errors_pct": 10
+          },
+          "top-produtos": {
+            "requests": 2,
+            "median_ms": 37292.7,
+            "p95_ms": 54475.1,
+            "p99_ms": 56002.4,
+            "errors_pct": 0
+          }
+        }
+      },
+      "resources": {
+        "api_cpu": 11.090833333333332,
+        "api_mem": 36.23694444444445,
+        "db_cpu": 96.5011111111111,
+        "db_mem": 387.84722222222223
+      },
+      "normal": {
+        "reads": 8319,
+        "hits": 414479,
+        "evictions": 5058,
+        "hit_rate": 0.9803239371993245
+      },
+      "bulk": {
+        "reads": 1766135,
+        "hits": 819940,
+        "evictions": 3642,
+        "reuses": 1756629
+      },
+      "tables": {
+        "pedidos": {
+          "heap_blks_read": 1730521,
+          "heap_blks_hit": 811294,
+          "idx_blks_read": 4,
+          "idx_blks_hit": 255
+        },
+        "itens_pedido": {
+          "heap_blks_read": 63237,
+          "heap_blks_hit": 98858,
+          "idx_blks_read": 2204,
+          "idx_blks_hit": 166753
+        }
+      },
+      "new_index": {
+        "idx_blks_read": 2204,
+        "idx_blks_hit": 166688,
+        "idx_scan": 56270,
+        "idx_tup_read": 168678,
+        "idx_tup_fetch": 168663
+      },
+      "per_request": {
+        "normal_reads": 51.351851851851855,
+        "normal_hits": 2558.5123456790125,
+        "normal_evictions": 31.22222222222222,
+        "bulk_reads": 10902.067901234568,
+        "bulk_reuses": 10843.388888888889,
+        "pedidos_heap_read": 10682.228395061727,
+        "pedidos_heap_hit": 5007.9876543209875,
+        "itens_heap_read": 390.35185185185185,
+        "itens_heap_hit": 610.2345679012345,
+        "index_read": 13.604938271604938,
+        "index_hit": 1028.9382716049383
+      }
+    },
+    {
+      "id": "o2-3",
+      "config": "O2",
+      "result": "20261120-221343-diag-cache-o2",
+      "before": "2026-11-21T01:13:43.556579+00:00",
+      "after": "2026-11-21T01:15:40.24087+00:00",
+      "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+      "shared_buffers": "128MB",
+      "track_io_timing": "off",
+      "summary": {
+        "requests": 132,
+        "rps": 1.8,
+        "median_ms": 3149.2,
+        "p95_ms": 31148.3,
+        "p99_ms": 37829.1,
+        "errors_pct": 0.76,
+        "routes": {
+          "cliente": {
+            "requests": 37,
+            "median_ms": 902.4,
+            "p95_ms": 2777.3,
+            "p99_ms": 2850.3,
+            "errors_pct": 0
+          },
+          "cliente-por-email": {
+            "requests": 23,
+            "median_ms": 3096.4,
+            "p95_ms": 5857.1,
+            "p99_ms": 7521,
+            "errors_pct": 0
+          },
+          "pedidos-do-cliente": {
+            "requests": 27,
+            "median_ms": 21707.6,
+            "p95_ms": 28961.4,
+            "p99_ms": 33054,
+            "errors_pct": 0
+          },
+          "pedidos-por-status": {
+            "requests": 16,
+            "median_ms": 21486.8,
+            "p95_ms": 34268.9,
+            "p99_ms": 34451.5,
+            "errors_pct": 0
+          },
+          "busca-produtos": {
+            "requests": 19,
+            "median_ms": 1715.2,
+            "p95_ms": 3581.9,
+            "p99_ms": 4929.2,
+            "errors_pct": 0
+          },
+          "vendas-por-dia": {
+            "requests": 9,
+            "median_ms": 18311.1,
+            "p95_ms": 36638.3,
+            "p99_ms": 38788.5,
+            "errors_pct": 0
+          },
+          "top-produtos": {
+            "requests": 1,
+            "median_ms": 59997.3,
+            "p95_ms": 59997.3,
+            "p99_ms": 59997.3,
+            "errors_pct": 100
+          }
+        }
+      },
+      "resources": {
+        "api_cpu": 9.446842105263158,
+        "api_mem": 30.349999999999998,
+        "db_cpu": 94.46473684210527,
+        "db_mem": 393.8552631578947
+      },
+      "normal": {
+        "reads": 134,
+        "hits": 171424,
+        "evictions": 0,
+        "hit_rate": 0.9992189230464332
+      },
+      "bulk": {
+        "reads": 1892144,
+        "hits": 840061,
+        "evictions": 486,
+        "reuses": 1880640
+      },
+      "tables": {
+        "pedidos": {
+          "heap_blks_read": 1565325,
+          "heap_blks_hit": 663970,
+          "idx_blks_read": 0,
+          "idx_blks_hit": 226
+        },
+        "itens_pedido": {
+          "heap_blks_read": 349336,
+          "heap_blks_hit": 214415,
+          "idx_blks_read": 0,
+          "idx_blks_hit": 58
+        }
+      },
+      "new_index": {},
+      "per_request": {
+        "normal_reads": 1.0151515151515151,
+        "normal_hits": 1298.6666666666667,
+        "normal_evictions": 0,
+        "bulk_reads": 14334.424242424242,
+        "bulk_reuses": 14247.272727272728,
+        "pedidos_heap_read": 11858.522727272728,
+        "pedidos_heap_hit": 5030.075757575758,
+        "itens_heap_read": 2646.4848484848485,
+        "itens_heap_hit": 1624.3560606060605,
+        "index_read": 0,
+        "index_hit": 0
+      }
+    },
+    {
+      "id": "o3-3",
+      "config": "O3",
+      "result": "20261120-221707-diag-cache-o3",
+      "before": "2026-11-21T01:17:07.039891+00:00",
+      "after": "2026-11-21T01:19:03.158887+00:00",
+      "stats_reset": "2026-11-21T01:15:59.368403+00:00",
+      "shared_buffers": "128MB",
+      "track_io_timing": "off",
+      "summary": {
+        "requests": 154,
+        "rps": 2.23,
+        "median_ms": 2899.9,
+        "p95_ms": 29928.1,
+        "p99_ms": 52736,
+        "errors_pct": 0,
+        "routes": {
+          "cliente": {
+            "requests": 41,
+            "median_ms": 908.1,
+            "p95_ms": 1701.2,
+            "p99_ms": 1877.3,
+            "errors_pct": 0
+          },
+          "cliente-por-email": {
+            "requests": 27,
+            "median_ms": 2946.7,
+            "p95_ms": 4579.3,
+            "p99_ms": 4851.1,
+            "errors_pct": 0
+          },
+          "pedidos-do-cliente": {
+            "requests": 31,
+            "median_ms": 11494.4,
+            "p95_ms": 16237.5,
+            "p99_ms": 16669.5,
+            "errors_pct": 0
+          },
+          "pedidos-por-status": {
+            "requests": 19,
+            "median_ms": 20895.7,
+            "p95_ms": 34293.5,
+            "p99_ms": 38690.2,
+            "errors_pct": 0
+          },
+          "busca-produtos": {
+            "requests": 24,
+            "median_ms": 1719.5,
+            "p95_ms": 2503.3,
+            "p99_ms": 2605.9,
+            "errors_pct": 0
+          },
+          "vendas-por-dia": {
+            "requests": 11,
+            "median_ms": 28588.8,
+            "p95_ms": 53610.2,
+            "p99_ms": 58189.5,
+            "errors_pct": 0
+          },
+          "top-produtos": {
+            "requests": 1,
+            "median_ms": 58204.9,
+            "p95_ms": 58204.9,
+            "p99_ms": 58204.9,
+            "errors_pct": 0
+          }
+        }
+      },
+      "resources": {
+        "api_cpu": 11.81142857142857,
+        "api_mem": 35.05200000000001,
+        "db_cpu": 96.44342857142857,
+        "db_mem": 393.7028571428572
+      },
+      "normal": {
+        "reads": 8374,
+        "hits": 421473,
+        "evictions": 5197,
+        "hit_rate": 0.9805186496590648
+      },
+      "bulk": {
+        "reads": 1786851,
+        "hits": 759280,
+        "evictions": 3344,
+        "reuses": 1777553
+      },
+      "tables": {
+        "pedidos": {
+          "heap_blks_read": 1761493,
+          "heap_blks_hit": 759484,
+          "idx_blks_read": 4,
+          "idx_blks_hit": 248
+        },
+        "itens_pedido": {
+          "heap_blks_read": 52643,
+          "heap_blks_hit": 94706,
+          "idx_blks_read": 2056,
+          "idx_blks_hit": 179813
+        }
+      },
+      "new_index": {
+        "idx_blks_read": 2056,
+        "idx_blks_hit": 179749,
+        "idx_scan": 60576,
+        "idx_tup_read": 181609,
+        "idx_tup_fetch": 181593
+      },
+      "per_request": {
+        "normal_reads": 54.37662337662338,
+        "normal_hits": 2736.8376623376626,
+        "normal_evictions": 33.746753246753244,
+        "bulk_reads": 11602.92857142857,
+        "bulk_reuses": 11542.551948051949,
+        "pedidos_heap_read": 11438.266233766233,
+        "pedidos_heap_hit": 4931.714285714285,
+        "itens_heap_read": 341.8376623376623,
+        "itens_heap_hit": 614.974025974026,
+        "index_read": 13.35064935064935,
+        "index_hit": 1167.2012987012988
+      }
+    }
+  ],
+  "medians": {
+    "O2": {
+      "requests": 112,
+      "rps": 1.52,
+      "p95_general_ms": 33979.6,
+      "p95_d01_ms": 32014.4,
+      "api_cpu_avg_pct": 8.79394736842105,
+      "api_mem_avg_mib": 28.818108108108106,
+      "db_cpu_avg_pct": 97.81157894736842,
+      "db_mem_avg_mib": 394.2972972972973,
+      "normal_reads": 122,
+      "normal_hits": 157414,
+      "normal_evictions": 0,
+      "normal_hit_rate": 0.9992255738370912,
+      "bulk_reads": 1773112,
+      "bulk_hits": 740967,
+      "bulk_evictions": 0,
+      "bulk_reuses": 1762306,
+      "normal_reads_per_req": 1.0446428571428572,
+      "normal_hits_per_req": 1376.7857142857142,
+      "normal_evictions_per_req": 0,
+      "bulk_reads_per_req": 15336.9375,
+      "bulk_reuses_per_req": 15241.348214285714,
+      "pedidos_heap_read": 1464007,
+      "pedidos_heap_hit": 617480,
+      "itens_heap_read": 331491,
+      "itens_heap_hit": 184485,
+      "new_index_read": 0,
+      "new_index_hit": 0,
+      "new_index_scan": 0,
+      "route_requests_total": {
+        "cliente": 94,
+        "cliente-por-email": 66,
+        "pedidos-do-cliente": 74,
+        "pedidos-por-status": 46,
+        "busca-produtos": 47,
+        "vendas-por-dia": 23,
+        "top-produtos": 3
+      }
+    },
+    "O3": {
+      "requests": 162,
+      "rps": 2.31,
+      "p95_general_ms": 28249.7,
+      "p95_d01_ms": 15331.2,
+      "api_cpu_avg_pct": 11.81142857142857,
+      "api_mem_avg_mib": 36.23694444444445,
+      "db_cpu_avg_pct": 96.5011111111111,
+      "db_mem_avg_mib": 387.84722222222223,
+      "normal_reads": 8374,
+      "normal_hits": 421473,
+      "normal_evictions": 5197,
+      "normal_hit_rate": 0.9803239371993245,
+      "bulk_reads": 1786851,
+      "bulk_hits": 819940,
+      "bulk_evictions": 3642,
+      "bulk_reuses": 1777553,
+      "normal_reads_per_req": 54.37662337662338,
+      "normal_hits_per_req": 2736.810975609756,
+      "normal_evictions_per_req": 33.746753246753244,
+      "bulk_reads_per_req": 11100.951219512195,
+      "bulk_reuses_per_req": 11041.798780487805,
+      "pedidos_heap_read": 1761493,
+      "pedidos_heap_hit": 811294,
+      "itens_heap_read": 59459,
+      "itens_heap_hit": 98858,
+      "new_index_read": 2204,
+      "new_index_hit": 179749,
+      "new_index_scan": 60576,
+      "route_requests_total": {
+        "cliente": 125,
+        "cliente-por-email": 89,
+        "pedidos-do-cliente": 94,
+        "pedidos-por-status": 58,
+        "busca-produtos": 77,
+        "vendas-por-dia": 33,
+        "top-produtos": 4
+      }
+    }
+  },
+  "change_o2_to_o3_pct": {
+    "requests": 44.64285714285714,
+    "rps": 51.97368421052633,
+    "p95_general_ms": -16.86276471765411,
+    "p95_d01_ms": -52.11154980258883,
+    "api_cpu_avg_pct": 34.31315968348021,
+    "api_mem_avg_mib": 25.743661965960275,
+    "db_cpu_avg_pct": -1.3397880397805095,
+    "db_mem_avg_mib": -1.635840549576928,
+    "normal_reads": 6763.934426229508,
+    "normal_hits": 167.74810372647923,
+    "normal_evictions": null,
+    "normal_hit_rate": -1.8916285904476138,
+    "bulk_reads": 0.7748523499925497,
+    "bulk_hits": 10.65809948351275,
+    "bulk_evictions": null,
+    "bulk_reuses": 0.865173244601114,
+    "normal_reads_per_req": 5105.283605283605,
+    "normal_hits_per_req": 98.78263895479422,
+    "normal_evictions_per_req": null,
+    "bulk_reads_per_req": -27.61950539661393,
+    "bulk_reuses_per_req": -27.553661098443193,
+    "pedidos_heap_read": 20.319984808815803,
+    "pedidos_heap_hit": 31.387899203213053,
+    "itens_heap_read": -82.06316310246734,
+    "itens_heap_hit": -46.414071604737515,
+    "new_index_read": null,
+    "new_index_hit": null,
+    "new_index_scan": null
+  }
+}

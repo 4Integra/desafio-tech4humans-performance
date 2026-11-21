@@ -1,0 +1,11 @@
+configuracao=O3
+commit=6eaacb753556eecb7927e1fdc0268938b3b56d70
+indice_presente=1
+cardinalidades=100000|500000|1500000|20000
+shared_buffers=128MB
+track_io_timing=off
+NAME                          IMAGE                     COMMAND                  SERVICE   CREATED              STATUS                        PORTS
+desafio-performance-api-1     desafio-performance-api   "docker-entrypoint.s…"   api       About a minute ago   Up 5 seconds                  127.0.0.1:3000->3000/tcp
+desafio-performance-banco-1   postgres:16.4             "docker-entrypoint.s…"   banco     About a minute ago   Up About a minute (healthy)   127.0.0.1:5432->5432/tcp
+api: cpus=500000000 memoria=268435456
+banco: cpus=1000000000 memoria=536870912

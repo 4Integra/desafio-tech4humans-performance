@@ -1,0 +1,404 @@
+{
+    "banco": "loja",
+    "pg_stat_io": [
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkread",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "autovacuum launcher"
+        },
+        {
+            "hits": 0,
+            "reads": 1,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "autovacuum launcher"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkread",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "autovacuum worker"
+        },
+        {
+            "hits": 41268,
+            "reads": 268,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 4,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "autovacuum worker"
+        },
+        {
+            "hits": 9376,
+            "reads": 22673,
+            "object": "relation",
+            "reuses": 22588,
+            "context": "vacuum",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "autovacuum worker"
+        },
+        {
+            "hits": 325149,
+            "reads": 1045302,
+            "object": "relation",
+            "reuses": 1037439,
+            "context": "bulkread",
+            "evictions": 326,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "background worker"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkwrite",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "background worker"
+        },
+        {
+            "hits": 47367,
+            "reads": 5,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "background worker"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "vacuum",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "background worker"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "temp relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "background worker"
+        },
+        {
+            "hits": null,
+            "reads": null,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": null,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "background writer"
+        },
+        {
+            "hits": null,
+            "reads": null,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": null,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "checkpointer"
+        },
+        {
+            "hits": 544873,
+            "reads": 1411653,
+            "object": "relation",
+            "reuses": 1403936,
+            "context": "bulkread",
+            "evictions": 192,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "client backend"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkwrite",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "client backend"
+        },
+        {
+            "hits": 23871684,
+            "reads": 55336,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 76530,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "client backend"
+        },
+        {
+            "hits": 15593,
+            "reads": 16489,
+            "object": "relation",
+            "reuses": 16456,
+            "context": "vacuum",
+            "evictions": 33,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "client backend"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "temp relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "client backend"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkread",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "standalone backend"
+        },
+        {
+            "hits": 7,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkwrite",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "standalone backend"
+        },
+        {
+            "hits": 85668,
+            "reads": 535,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "standalone backend"
+        },
+        {
+            "hits": 907,
+            "reads": 10,
+            "object": "relation",
+            "reuses": 0,
+            "context": "vacuum",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "standalone backend"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkread",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "startup"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkwrite",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "startup"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "startup"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "vacuum",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "startup"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkread",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "walsender"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "bulkwrite",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "walsender"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "walsender"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "relation",
+            "reuses": 0,
+            "context": "vacuum",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "walsender"
+        },
+        {
+            "hits": 0,
+            "reads": 0,
+            "object": "temp relation",
+            "reuses": null,
+            "context": "normal",
+            "evictions": 0,
+            "stats_reset": "2026-11-21T01:12:36.592345+00:00",
+            "backend_type": "walsender"
+        }
+    ],
+    "shared_buffers": "128MB",
+    "coletado_em_utc": "2026-11-21T01:15:40.24087+00:00",
+    "track_io_timing": "off",
+    "pg_stat_database": {
+        "datname": "loja",
+        "blks_hit": 24830148,
+        "blks_read": 2550270,
+        "temp_bytes": 634432640,
+        "temp_files": 32,
+        "stats_reset": null
+    },
+    "pg_stat_user_indexes": [
+        {
+            "relname": "clientes",
+            "idx_scan": 500095,
+            "idx_tup_read": 500091,
+            "indexrelname": "clientes_pkey",
+            "idx_tup_fetch": 500091
+        },
+        {
+            "relname": "itens_pedido",
+            "idx_scan": 0,
+            "idx_tup_read": 0,
+            "indexrelname": "itens_pedido_pkey",
+            "idx_tup_fetch": 0
+        },
+        {
+            "relname": "pedidos",
+            "idx_scan": 1500054,
+            "idx_tup_read": 1500054,
+            "indexrelname": "pedidos_pkey",
+            "idx_tup_fetch": 1500028
+        },
+        {
+            "relname": "produtos",
+            "idx_scan": 1500129,
+            "idx_tup_read": 1500129,
+            "indexrelname": "produtos_pkey",
+            "idx_tup_fetch": 1500123
+        }
+    ],
+    "shared_buffers_bytes": 134217728,
+    "pg_statio_user_tables": [
+        {
+            "relname": "clientes",
+            "idx_blks_hit": 1199851,
+            "heap_blks_hit": 1144016,
+            "idx_blks_read": 340,
+            "heap_blks_read": 3471
+        },
+        {
+            "relname": "itens_pedido",
+            "idx_blks_hit": 1671599,
+            "heap_blks_hit": 4736369,
+            "idx_blks_read": 2,
+            "heap_blks_read": 470701
+        },
+        {
+            "relname": "pedidos",
+            "idx_blks_hit": 5154040,
+            "heap_blks_hit": 4698115,
+            "idx_blks_read": 1380,
+            "heap_blks_read": 2072869
+        },
+        {
+            "relname": "produtos",
+            "idx_blks_hit": 3039893,
+            "heap_blks_hit": 3031945,
+            "idx_blks_read": 100,
+            "heap_blks_read": 573
+        }
+    ],
+    "pg_statio_user_indexes": [
+        {
+            "relname": "clientes",
+            "idx_blks_hit": 1199851,
+            "indexrelname": "clientes_pkey",
+            "idx_blks_read": 340
+        },
+        {
+            "relname": "itens_pedido",
+            "idx_blks_hit": 1671599,
+            "indexrelname": "itens_pedido_pkey",
+            "idx_blks_read": 2
+        },
+        {
+            "relname": "pedidos",
+            "idx_blks_hit": 5154040,
+            "indexrelname": "pedidos_pkey",
+            "idx_blks_read": 1380
+        },
+        {
+            "relname": "produtos",
+            "idx_blks_hit": 3039893,
+            "indexrelname": "produtos_pkey",
+            "idx_blks_read": 100
+        }
+    ],
+    "servidor_iniciado_em_utc": "2026-11-21T01:13:18.58616+00:00"
+}

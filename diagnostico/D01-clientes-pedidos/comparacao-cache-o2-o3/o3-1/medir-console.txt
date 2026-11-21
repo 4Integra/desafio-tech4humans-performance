@@ -1,0 +1,31 @@
+Aquecendo por 15s (não entra na medição)...
+Medindo: 20 usuários virtuais por 60s...
+Medição: diag-cache-o3
+Carga: 20 usuários virtuais por 60s
+
+Requisições:        164
+Requisições/s:      2.31
+Tempo de resposta:  mediana 2756.0 ms | p95 28249.7 ms | p99 51486.1 ms
+Erros:              0.61%
+
+Por rota:
+rota                  req       mediana       p95           p99           erros   
+cliente               43        855.6 ms      2057.3 ms     2368.4 ms     0.0%    
+cliente-por-email     31        2876.8 ms     4444.9 ms     4505.4 ms     0.0%    
+pedidos-do-cliente    32        9947.5 ms     15331.2 ms    16330.8 ms    0.0%    
+pedidos-por-status    20        19797.2 ms    38328.3 ms    40297.0 ms    0.0%    
+busca-produtos        25        1392.3 ms     2077.3 ms     2105.5 ms     0.0%    
+vendas-por-dia        12        21772.7 ms    52317.7 ms    56891.8 ms    0.0%    
+top-produtos          1         59998.1 ms    59998.1 ms    59998.1 ms    100.0%  
+Conferindo o contrato depois da carga...
+
+Uso de recursos durante a carga:
+container                            amostras  cpu_media    cpu_max    mem_media      mem_max
+desafio-performance-banco-1                35     101.3%     100.0%    386.8 MiB    443.8 MiB
+desafio-performance-api-1                  35      13.7%       9.6%     37.0 MiB     51.9 MiB
+
+cpu_percentual: 100% = 1 CPU inteira.
+
+Contrato: Contrato mantido: as 42 respostas são iguais às gravadas.
+
+Resultado salvo em resultados/20261120-220316-diag-cache-o3/

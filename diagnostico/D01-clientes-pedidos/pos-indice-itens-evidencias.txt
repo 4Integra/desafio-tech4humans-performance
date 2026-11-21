@@ -1,0 +1,213 @@
+DIAGNÓSTICO D01 APÓS O ÍNDICE DE ITENS — EVIDÊNCIAS
+
+1. CONTEXTO
+
+- Repositório: /home/kakau/meu-desafio
+- Branch: main
+- HEAD durante a coleta: a9d2cc0f2e262b2d555a1ad4c6de041e91ddc1f3
+- Árvore Git antes da coleta: limpa
+- Containers: API ativa; PostgreSQL ativo e saudável.
+- Implementação: batchings de itens e produtos, mais índice B-tree em
+  itens_pedido(pedido_id).
+- Todas as consultas foram executadas em transação READ ONLY, com
+  statement_timeout=30000 ms e lock_timeout=2000 ms.
+- Script reproduzível:
+  diagnostico/D01-clientes-pedidos/pos-indice-itens-comandos.sql
+
+2. MEDIDO — RESULTADOS OFICIAIS EXISTENTES
+
+Fontes:
+- Linha de base: resultados/20261120-093234-00-linha-de-base,
+  resultados/20261120-093458-00-linha-de-base e
+  resultados/20261120-093707-00-linha-de-base.
+- O2: resultados/20261120-164142-02-lote-produtos-d01,
+  resultados/20261120-164345-02-lote-produtos-d01 e
+  resultados/20261120-164549-02-lote-produtos-d01.
+- O3: resultados/20261120-202706-03-indice-itens-d01,
+  resultados/20261120-202921-03-indice-itens-d01 e
+  resultados/20261120-203133-03-indice-itens-d01.
+
+Medianas das três execuções:
+
+Indicador                         Linha de base    O2          O3
+Requisições/s                     2.11             2.98        1.91
+p95 geral (ms)                    32989.4          16802.1     33649.9
+p95 D01 (ms)                      33988.5          16084.4     19494.6
+CPU média PostgreSQL (%)          95.6324          96.9612     95.5431
+CPU média API (%)                 9.20139          9.52314     10.4132
+Memória média PostgreSQL (MiB)    394.670          390.237     386.854
+Memória média API (MiB)           28.1697          32.6788     32.8816
+
+O2 para O3:
+- requisições/s: -35.91%;
+- p95 geral: +100.27%;
+- p95 D01: +21.20%;
+- CPU média PostgreSQL: -1.46%, permanecendo próxima do limite.
+
+Medianas dos p95 de outras rotas na O3:
+- pedidos-por-status: 43780.2 ms;
+- vendas-por-dia: 38233.2 ms;
+- top-produtos: 56240.3 ms.
+
+Houve timeout em vendas-por-dia na primeira execução O3 e em
+pedidos-por-status na terceira. D01 não registrou erro. Essas métricas pertencem
+à carga mista e não demonstram causa.
+
+3. PARÂMETROS FIXADOS ANTES DOS PLANOS
+
+Foi mantido o mesmo caso mediano dos diagnósticos anteriores:
+- cliente: 3;
+- pedidos: 43262, 143262, 243262, 343262 e 443262;
+- itens: 15, três por pedido;
+- produtos únicos: 125, 12886 e 13892.
+
+Índices encontrados:
+- clientes_pkey ON clientes(id);
+- pedidos_pkey ON pedidos(id);
+- itens_pedido_pkey ON itens_pedido(id);
+- idx_itens_pedido_pedido_id ON itens_pedido(pedido_id);
+- produtos_pkey ON produtos(id).
+
+Não foi encontrado índice em pedidos(cliente_id).
+
+4. MEDIDO — EXPLAIN (ANALYZE, BUFFERS)
+
+4.1 Cliente id=3
+
+Index Scan using clientes_pkey on clientes.
+Estimativa: 1 linha; resultado: 1 linha.
+Buffers: shared hit=3.
+Planning Time: 0.390 ms.
+Execution Time: 0.780 ms.
+
+4.2 Pedidos do cliente 3 — repetição 1
+
+Gather Merge; estimativa 4 linhas; resultado: 5 linhas.
+  Parallel Seq Scan on pedidos; 3 loops.
+  Rows Removed by Filter: 166665 por loop (499995 no total).
+  Sort Method: quicksort; 25 kB.
+Buffers: shared hit=9159 read=11801 (20960 blocos).
+Planning Time: 0.216 ms.
+Execution Time: 190.562 ms.
+
+4.3 Pedidos do cliente 3 — repetição 2
+
+Mesmo plano: Gather Merge, Sort e Parallel Seq Scan.
+Rows Removed by Filter: 166665 por loop; 3 loops.
+Buffers: shared hit=9255 read=11705 (20960 blocos).
+Planning Time: 0.080 ms.
+Execution Time: 181.061 ms.
+
+4.4 Pedidos do cliente 3 — repetição 3
+
+Mesmo plano: Gather Merge, Sort e Parallel Seq Scan.
+Rows Removed by Filter: 166665 por loop; 3 loops.
+Buffers: shared hit=9351 read=11609 (20960 blocos).
+Planning Time: 0.097 ms.
+Execution Time: 117.783 ms.
+
+Mediana das três execuções isoladas de pedidos: 181.061 ms.
+
+4.5 Itens dos cinco pedidos — repetição 1
+
+Incremental Sort; estimativa 18 linhas; resultado: 15 linhas.
+  Index Scan using idx_itens_pedido_pedido_id on itens_pedido.
+  Index Cond: pedido_id = ANY({43262,143262,243262,343262,443262}).
+  Sort Key: pedido_id, id; Presorted Key: pedido_id.
+Buffers: shared hit=20.
+Planning Time: 0.205 ms.
+Execution Time: 0.075 ms.
+
+4.6 Itens dos cinco pedidos — repetição 2
+
+Mesmo plano: Index Scan e Incremental Sort.
+Estimativa: 18 linhas; resultado: 15 linhas.
+Buffers: shared hit=20.
+Planning Time: 0.179 ms.
+Execution Time: 0.127 ms.
+
+4.7 Itens dos cinco pedidos — repetição 3
+
+Mesmo plano: Index Scan e Incremental Sort.
+Estimativa: 18 linhas; resultado: 15 linhas.
+Buffers: shared hit=20.
+Planning Time: 0.133 ms.
+Execution Time: 0.099 ms.
+
+Mediana das três execuções isoladas de itens: 0.099 ms.
+Não houve Seq Scan nem linhas removidas por filtro.
+
+4.8 Produtos 125, 12886 e 13892
+
+Index Scan using produtos_pkey on produtos.
+Estimativa: 3 linhas; resultado: 3 linhas.
+Buffers: shared hit=7 read=2.
+Planning Time: 0.454 ms.
+Execution Time: 3.843 ms.
+
+5. COMPARAÇÃO COM O DIAGNÓSTICO PÓS-BATCHING
+
+Antes do índice, a consulta em lote de itens:
+- usava Parallel Seq Scan em 1500000 linhas;
+- removia 1499985 linhas por filtro;
+- acessava 9667 buffers por repetição;
+- levou 284.516, 212.529 e 197.650 ms;
+- teve mediana isolada de 212.529 ms.
+
+Depois do índice, a mesma consulta e os mesmos parâmetros:
+- usam Index Scan em idx_itens_pedido_pedido_id;
+- retornam 15 linhas sem varredura completa;
+- acessam 20 buffers por repetição;
+- levaram 0.075, 0.127 e 0.099 ms;
+- tiveram mediana isolada de 0.099 ms.
+
+O plano, os buffers e o tempo isolado demonstram que o índice cumpriu a função
+de localizar os itens sem varrer a tabela. A diferença de tempos não é uma
+decomposição da latência HTTP e não prova efeito causal no benchmark misto.
+
+A consulta de pedidos não mudou: continua varrendo 500000 registros para
+devolver 5. O plano atual removeu 499995 linhas, acessou 20960 buffers por
+repetição e teve mediana isolada de 181.061 ms.
+
+6. OBSERVADO NO CÓDIGO
+
+- api/src/rotas.js:66: consulta cliente por chave primária.
+- api/src/rotas.js:69-72: consulta pedidos por cliente_id e ordena o resultado.
+- api/src/rotas.js:77-80: consulta itens em lote por pedido_id = ANY($1).
+- api/src/rotas.js:86-89: consulta produtos únicos em lote por id = ANY($1).
+- api/src/db.js:10-18: cada uma das quatro consultas abre e encerra um Client
+  PostgreSQL independente.
+
+A contagem de quatro consultas é derivada do código; os tempos são medidos nos
+planos isolados. O custo de conexão e a espera sob concorrência não foram
+decompostos.
+
+7. INTERPRETAÇÃO
+
+Medido:
+- o índice é usado e eliminou o Seq Scan de itens;
+- a consulta de itens deixou de ser a operação SQL isolada mais cara de D01;
+- a consulta de pedidos ainda realiza Parallel Seq Scan;
+- o PostgreSQL permaneceu perto de 96% de CPU média nas configurações O2 e O3;
+- outras rotas lentas e timeouts coexistiram na carga O3.
+
+Interpretação:
+- os planos não sustentam que o índice tenha tornado a consulta de itens mais
+  cara ou que tenha causado a regressão oficial;
+- a regressão O2 para O3 ocorreu no benchmark misto e pode refletir contenção,
+  fila e variabilidade de outras operações, mas esta coleta não identifica sua
+  causa exata;
+- dentro de D01, a varredura de pedidos é o trabalho SQL isolado relevante que
+  permanece visível.
+
+Os tempos isolados não devem ser somados como decomposição dos 12 a 16 segundos
+observados nas medianas HTTP de D01.
+
+8. LIMITAÇÕES
+
+- Os EXPLAIN foram executados sem a concorrência de 20 VUs.
+- O estado de cache não foi controlado entre diagnósticos.
+- CPU e memória são da carga mista.
+- D01 teve somente 27 a 29 amostras por execução O3.
+- Não houve tracing de fila, aquisição de conexão ou tempo fim a fim por etapa.
+- Não foram investigadas em profundidade as consultas das outras rotas.

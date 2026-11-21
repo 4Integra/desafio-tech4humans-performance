@@ -9,3 +9,5 @@ Agrupar a busca dos itens dos pedidos em uma única consulta deve reduzir o p95 
 Agrupar a busca dos produtos dos itens em uma única consulta deve reduzir o p95 da rota GET /clientes/:id/pedidos, porque elimina consultas sequenciais repetidas ao banco.
 
 Criar um índice em `itens_pedido.pedido_id` deve reduzir o p95 da rota GET /clientes/:id/pedidos, porque permite localizar os itens dos pedidos sem realizar uma varredura completa da tabela.
+
+Aumentar `shared_buffers` de 128 MB para 160 MB deve reduzir o p95 da aplicação, porque disponibiliza mais espaço no cache do PostgreSQL para páginas de tabelas e índices.

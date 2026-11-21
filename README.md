@@ -381,6 +381,59 @@ Tudo o que você fizer direto no `psql` se perde quando o banco é apagado. Para
 2. Faça commit das suas mudanças, do `contrato/base.json` e das pastas de `resultados/`, sem editar os arquivos gerados. Faça um commit por mudança, seguido do commit com os resultados dela.
 3. Se mexer neste README, mantenha as instruções de subir e medir, para que outra pessoa consiga repetir o experimento.
 
+## Trabalho realizado neste repositório
+
+### Problema investigado
+
+O diagnóstico concentrou-se na latência de `GET /clientes/:id/pedidos` (D01), rota com peso de 20% na carga. A implementação original fazia consultas N+1 sequenciais e varreduras completas de `pedidos` e `itens_pedido`. Planos, comandos e limitações estão preservados em [`diagnostico/D01-clientes-pedidos/`](diagnostico/D01-clientes-pedidos/).
+
+### Experimentos
+
+As quatro mudanças foram medidas três vezes com 20 VUs, duração de 60s, aquecimento de 15s e semente 42. O contrato original de 42 respostas foi mantido. A tabela completa, fontes e consumo de recursos estão em [`experimentos.md`](experimentos.md).
+
+| Etapa | Mudança | Resultado observado na campanha oficial |
+| --- | --- | --- |
+| O1 | Batching dos itens com `pedido_id = ANY($1)` | Contra a linha de base: req/s `+20,38%`, p95 geral `−30,77%` e p95 D01 `−13,26%`. |
+| O2 | Batching dos produtos com `id = ANY($1)` | Contra O1: req/s `+17,32%`, p95 geral `−26,43%` e p95 D01 `−45,45%`. Foi o melhor resultado da campanha oficial original. |
+| O3 | Índice B-tree em `itens_pedido.pedido_id` | Contra O2: req/s `−35,91%`, p95 geral `+100,27%` e p95 D01 `+21,20%`. O índice melhorou a consulta isolada, mas a campanha oficial teve regressão global. |
+| O4 | `shared_buffers` de 128 MB para 160 MB | Contra O3: req/s `+9,95%`, p95 geral `−21,30%` e p95 D01 `−9,23%`. Melhorou as medianas observadas, mas não superou O2 na campanha original. |
+
+O diagnóstico controlado posterior O2 × O3 não reproduziu a regressão oficial de O3. Ele permanece identificado como investigação complementar em [`comparacao-cache-o2-o3.md`](diagnostico/D01-clientes-pedidos/comparacao-cache-o2-o3.md) e não substitui os benchmarks oficiais. A divergência entre campanhas evidencia variabilidade experimental; não foi demonstrada causalidade definitiva nem redução de custo operacional.
+
+### Configuração versionada e reprodução
+
+A branch `main` mantém cumulativamente os batchings O1/O2, o índice O3 e `shared_buffers=160MB` da O4. Os limites continuam em 0,5 CPU/256 MiB para a API e 1 CPU/512 MiB para o PostgreSQL. Essa é a última configuração experimentada, não uma afirmação de que seja globalmente ótima; escolher O2 como configuração final exigiria uma mudança funcional e nova validação.
+
+Em um clone ou ambiente descartável, a configuração atual pode ser reproduzida do zero com:
+
+```bash
+docker compose down -v
+docker compose up -d --build
+docker compose exec -T banco psql -U loja -d loja -c 'SHOW shared_buffers;'
+scripts/verificar-contrato.sh comparar
+```
+
+O valor esperado de `shared_buffers` é `160MB`. A recriação do volume é necessária para que o arquivo `banco/03-indice-itens-pedido-pedido-id.sql` seja aplicado.
+
+As medições oficiais podem ser localizadas pelos rótulos:
+
+```bash
+ls -d resultados/*-00-linha-de-base
+ls -d resultados/*-01-lote-itens-d01
+ls -d resultados/*-02-lote-produtos-d01
+ls -d resultados/*-03-indice-itens-d01
+ls -d resultados/*-04-shared-buffers-160mb
+```
+
+Documentação complementar:
+
+- [Experimentos e resultados](experimentos.md)
+- [Próximos testes pesquisados](proximos-testes.md)
+- [Diagnóstico original de D01](diagnostico/D01-clientes-pedidos/conclusao.md)
+- [Diagnóstico após os batchings](diagnostico/D01-clientes-pedidos/pos-batching-conclusao.md)
+- [Diagnóstico após o índice](diagnostico/D01-clientes-pedidos/pos-indice-itens-conclusao.md)
+- [Comparação controlada de cache O2 × O3](diagnostico/D01-clientes-pedidos/comparacao-cache-o2-o3.md)
+
 ## Usar um agente de IA
 
 O [AGENTS.md](AGENTS.md) resume, para agentes como Claude Code, Codex ou Cursor, como rodar e medir a aplicação e o que não pode ser mudado. Ele não traz o enunciado: passe o enunciado para o agente junto com o seu pedido.

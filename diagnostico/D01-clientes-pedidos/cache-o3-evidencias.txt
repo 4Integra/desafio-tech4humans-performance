@@ -1,0 +1,179 @@
+DIAGNÓSTICO D01 — FOTOGRAFIA DE CACHE APÓS O3
+
+1. CONTEXTO
+
+- Coletado em: 2026-11-21 00:27:31.013903+00 (UTC).
+- Repositório: /home/kakau/meu-desafio.
+- Branch: main.
+- HEAD documental: 4f528b889560aee894526bdfc12b338dadca2337.
+- Implementação O3: 6eaacb753556eecb7927e1fdc0268938b3b56d70.
+- PostgreSQL: 16.4.
+- Servidor iniciado em: 2026-11-20 23:25:30.126757+00.
+- Coleta somente leitura; nenhuma estatística foi redefinida.
+- Script: diagnostico/D01-clientes-pedidos/cache-o3-comandos.sql.
+
+Configurações:
+- shared_buffers: 128MB (134217728 bytes).
+- track_io_timing: off.
+- pg_buffercache habilitado: falso.
+
+Consequências:
+- read_time igual a zero não demonstra ausência de custo de I/O, pois
+  track_io_timing está desabilitado.
+- não foi coletada ocupação instantânea por relação, porque pg_buffercache não
+  estava habilitado e a extensão não foi instalada.
+
+2. PG_STAT_DATABASE — BANCO LOJA
+
+blks_read: 4535729
+blks_hit: 28475541
+temp_files: 92
+temp_bytes: 1773751424
+stats_reset: NULL
+
+Taxa derivada de hits: 86.26%.
+Os valores são acumulados e não delimitam uma execução O3.
+
+3. PG_STAT_IO
+
+stats_reset de todas as linhas: 2026-11-20 23:24:40.439343+00.
+pg_stat_io é global ao cluster.
+
+backend_type         object          context    reads    hits      evictions  reuses
+autovacuum launcher  relation        bulkread   0        0         0          0
+autovacuum launcher  relation        normal     1        0         0          NULL
+autovacuum worker    relation        bulkread   0        0         0          0
+autovacuum worker    relation        normal     676      56734     397        NULL
+autovacuum worker    relation        vacuum     30369    1680      0          30300
+background worker    relation        bulkread   1858421  1138855   11181      1843053
+background worker    relation        bulkwrite  0        0         0          0
+background worker    relation        normal     13299    372720    9772       NULL
+background worker    relation        vacuum     0        0         0          0
+background worker    temp relation   normal     0        0         0          NULL
+client backend       relation        bulkread   2544467  2363250   11872      2528900
+client backend       relation        bulkwrite  0        0         0          0
+client backend       relation        normal     73839    24599047  91428      NULL
+client backend       relation        vacuum     16489    15593     33         16456
+client backend       temp relation   normal     0        0         0          NULL
+standalone backend   relation        bulkread   0        0         0          0
+standalone backend   relation        bulkwrite  0        7         0          0
+standalone backend   relation        normal     535      85668     0          NULL
+standalone backend   relation        vacuum     10       907       0          0
+startup              relation        bulkread   0        0         0          0
+startup              relation        bulkwrite  0        0         0          0
+startup              relation        normal     0        0         0          NULL
+startup              relation        vacuum     0        0         0          0
+walsender             relation        bulkread   0        0         0          0
+walsender             relation        bulkwrite  0        0         0          0
+walsender             relation        normal     0        0         0          NULL
+walsender             relation        vacuum     0        0         0          0
+walsender             temp relation   normal     0        0         0          NULL
+
+As linhas background writer, checkpointer/relation/normal têm contadores NULL e
+foram omitidas da tabela acima. read_time foi 0 onde aplicável, mas não é
+interpretável com track_io_timing=off.
+
+Leitura descritiva:
+- há reads, hits e evictions acumulados em normal e bulkread;
+- bulkread registra reuses, enquanto normal apresenta reuses NULL;
+- reuses representa reutilização dentro da estratégia de acesso e não equivale
+  a evictions.
+
+4. PG_STATIO_USER_TABLES
+
+relname       heap_read  heap_hit  idx_read  idx_hit   toast_read  toast_hit
+clientes      3471       1220468   478       1200259   0           0
+itens_pedido  215499     4769945   9291      2195000   NULL        NULL
+pedidos       4303816    7446572   1389      5154525   0           0
+produtos      577        3050802   249       3040378   0           0
+
+Taxas derivadas de hits no heap:
+- itens_pedido: 95.68%;
+- pedidos: 63.37%.
+
+Essas taxas são acumuladas e não representam um intervalo O3 isolado.
+
+5. PG_STATIO_USER_INDEXES E USO DO NOVO ÍNDICE
+
+relname       indexrelname                    idx_read  idx_hit
+clientes      clientes_pkey                   478       1200259
+itens_pedido  idx_itens_pedido_pedido_id      9289      523279
+itens_pedido  itens_pedido_pkey               2         1671721
+pedidos       pedidos_pkey                    1389      5154525
+produtos      produtos_pkey                   249       3040378
+
+Novo índice:
+- idx_scan: 177441;
+- last_idx_scan: 2026-11-21 00:02:18.250317+00;
+- idx_tup_read: 531956;
+- idx_tup_fetch: 531816;
+- taxa derivada de hits: 98.26%.
+
+O índice foi utilizado e teve leituras e hits relevantes no período acumulado.
+idx_scan não equivale necessariamente ao número de requisições HTTP.
+
+6. TAMANHOS
+
+relação                         relation_bytes  tamanho  total_bytes  total
+clientes                        9469952         9248 kB  11771904     11 MB
+pedidos                         170672128       163 MB   182009856    174 MB
+itens_pedido                    78274560        75 MB    134037504    128 MB
+produtos                        1556480         1520 kB  2064384      2016 kB
+clientes_pkey                   2260992         2208 kB  2260992      2208 kB
+pedidos_pkey                    11255808        11 MB    11255808     11 MB
+itens_pedido_pkey               33710080        32 MB    33710080     32 MB
+idx_itens_pedido_pedido_id      22003712        21 MB    22003712     21 MB
+produtos_pkey                   466944          456 kB   466944       456 kB
+
+O novo índice corresponde a 16.39% dos 128MB configurados em shared_buffers.
+Essa razão não significa que todos os blocos do índice estejam simultaneamente
+residentes ou que o índice reserve essa parcela do cache.
+
+7. EVIDÊNCIAS OBSERVADAS
+
+- Há atividade acumulada relevante de reads, hits, evictions e reuses.
+- O índice novo está sendo usado e acumulou 9289 leituras e 523279 hits.
+- O índice tem 21MB, tamanho não desprezível diante de shared_buffers=128MB.
+- As relações relevantes, especialmente pedidos e itens_pedido, têm tamanho
+  total superior ao pool configurado quando consideradas em conjunto.
+- O heap de pedidos apresenta muito mais leituras acumuladas e menor taxa de
+  hits que o heap de itens_pedido.
+
+8. INTERPRETAÇÕES POSSÍVEIS
+
+- O índice adiciona páginas candidatas ao cache e pode participar da competição
+  pelo pool compartilhado.
+- A presença simultânea de evictions, relações maiores que o pool e um índice
+  ativo torna razoável medir essa hipótese em comparação controlada.
+- Os dados não mostram quais relações foram desalojadas nem se o índice foi o
+  responsável pelas evictions observadas.
+- Os altos hits do índice também são compatíveis com benefício local e não
+  demonstram, por si, pressão prejudicial.
+
+9. O QUE NÃO PODE SER CONCLUÍDO
+
+- Não é possível afirmar que O3 aumentou evictions ou reads contra O2.
+- Não é possível atribuir a regressão oficial ao índice.
+- Não é possível distinguir leitura física obrigatória de atendimento pelo
+  cache do sistema operacional apenas com esses contadores.
+- Não há duração de I/O, porque track_io_timing estava desabilitado.
+- Não há ocupação instantânea por relação, porque pg_buffercache não estava
+  habilitado.
+
+10. CONTROLES NECESSÁRIOS PARA O2 × O3
+
+- Mesma máquina, dados, limites, parâmetros e sequência de carga.
+- Pelo menos três repetições por configuração, preferencialmente alternando a
+  ordem O2/O3 para reduzir deriva temporal.
+- Snapshots imediatamente antes e depois de cada execução, calculando deltas de
+  pg_stat_io, pg_statio_user_tables, pg_statio_user_indexes e
+  pg_stat_user_indexes.
+- Comparar separadamente contextos normal e bulkread.
+- Tratar reuses e evictions como contadores distintos.
+- Relacionar os deltas com p95, vazão, CPU e memória da mesma execução.
+- Manter track_io_timing idêntico nas duas configurações. No estado atual, off,
+  não haverá tempos de I/O.
+- Se uma futura metodologia autorizar pg_buffercache, habilitá-lo de maneira
+  idêntica antes de ambas as configurações e registrar ocupação no início e no
+  fim; ele não foi habilitado nesta coleta.
+- Não limpar caches entre execuções; controlar a ordem e registrar o estado.

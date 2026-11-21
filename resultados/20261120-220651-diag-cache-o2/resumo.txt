@@ -1,0 +1,17 @@
+Medição: diag-cache-o2
+Carga: 20 usuários virtuais por 60s
+
+Requisições:        112
+Requisições/s:      1.52
+Tempo de resposta:  mediana 4551.8 ms | p95 36110.1 ms | p99 44261.8 ms
+Erros:              0.00%
+
+Por rota:
+rota                  req       mediana       p95           p99           erros   
+cliente               29        1291.6 ms     2196.2 ms     2262.8 ms     0.0%    
+cliente-por-email     22        4508.5 ms     5910.8 ms     6148.2 ms     0.0%    
+pedidos-do-cliente    22        25708.9 ms    35607.8 ms    37674.5 ms    0.0%    
+pedidos-por-status    16        23455.8 ms    43499.3 ms    44214.1 ms    0.0%    
+busca-produtos        15        2097.5 ms     3223.9 ms     3597.6 ms     0.0%    
+vendas-por-dia        7         27417.5 ms    37799.5 ms    39403.3 ms    0.0%    
+top-produtos          1         57760.7 ms    57760.7 ms    57760.7 ms    0.0%    
